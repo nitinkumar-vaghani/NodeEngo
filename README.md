@@ -152,9 +152,8 @@ connectDB().then(() => {
 
 `npm run dev`
 
-```md
-Visit [Link Text]([https://example.com](http://localhost:5000)) — you should see API running.
-```
+Visit http://localhost:5000 — you should see API running.
+
 
 #### 🔧 Bonus: Nodemon Setup
 
