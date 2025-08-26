@@ -1,8 +1,8 @@
 Since you’ve already created a `src/config/env.mts` file to manage environment variables and imported it into `src/server.mts` with `import { config } from "./config/env.mts";`, you’re on a good path for handling environment variables in a structured way. Your `env.mts` file uses `dotenv` to load environment variables and provides a `config` object with type-safe access, default values, and required field validation. This setup is cleaner than directly calling `dotenv.config()` in `src/server.mts`, as it centralizes environment variable management.
 
-Given that your "Credit Control" application uses Node.js, Express, strict TypeScript (100% ESM), MongoDB with a multi-tenant model, and emphasizes performance, reliability, and clean code, you don’t need to follow all the steps from the previous response exactly. However, some steps are still relevant to adapt your existing setup for environment-specific builds (local, staging, production). The key difference is that you’re already loading environment variables via `src/config/env.mts`, so we’ll leverage that instead of modifying `src/server.mts` to call `dotenv.config()` directly.
+Given that your "Node Engo" application uses Node.js, Express, strict TypeScript (100% ESM), MongoDB with a multi-tenant model, and emphasizes performance, reliability, and clean code, you don’t need to follow all the steps from the previous response exactly. However, some steps are still relevant to adapt your existing setup for environment-specific builds (local, staging, production). The key difference is that you’re already loading environment variables via `src/config/env.mts`, so we’ll leverage that instead of modifying `src/server.mts` to call `dotenv.config()` directly.
 
-Below, I’ll guide you step-by-step to generate environment-specific builds for your Credit Control backend application, ensuring that the appropriate `.env` file (`.env.local`, `.env.staging`, `.env.production`) is loaded based on the environment. I’ll also integrate with your existing `src/config/env.mts` and ensure compatibility with your project’s standards.
+Below, I’ll guide you step-by-step to generate environment-specific builds for your Node Engo backend application, ensuring that the appropriate `.env` file (`.env.local`, `.env.staging`, `.env.production`) is loaded based on the environment. I’ll also integrate with your existing `src/config/env.mts` and ensure compatibility with your project’s standards.
 
 ### Key Points from Your Setup
 - **Existing `env.mts`**: Loads `.env` using `dotenv` and defines a `config` object with required and optional variables.
@@ -28,11 +28,11 @@ Since you’re already using `.env` for local development (as shown in `env.txt`
   APP_MODE=debug
   APP_ENABLE_LOG=true
   APP_PORT=8089
-  APP_URL=http://nv.api-nodengo.com:8089
+  APP_URL=http://nv.api-nod-engo.com:8089
 
   # MongoDB Config
   MONGO_DB_BASE_URI=mongodb://localhost:27017/
-  MONGO_DB_DEFAULT_NAME=credit_control
+  MONGO_DB_DEFAULT_NAME=node_engo
   MONGO_DB_PREFIX=cc_
 
   # Redis Config
@@ -67,11 +67,11 @@ Since you’re already using `.env` for local development (as shown in `env.txt`
   APP_MODE=warning
   APP_ENABLE_LOG=true
   APP_PORT=8089
-  APP_URL=http://staging.api-nodengo.com:8089
+  APP_URL=http://staging.api-node-engo.com:8089
 
   # MongoDB Config
   MONGO_DB_BASE_URI=mongodb://localhost:27017/
-  MONGO_DB_DEFAULT_NAME=credit_control
+  MONGO_DB_DEFAULT_NAME=node_engo
   MONGO_DB_PREFIX=cc_
 
   # Redis Config
@@ -110,7 +110,7 @@ Since you’re already using `.env` for local development (as shown in `env.txt`
 
   # MongoDB Config
   MONGO_DB_BASE_URI=mongodb://localhost:27017/
-  MONGO_DB_DEFAULT_NAME=credit_control
+  MONGO_DB_DEFAULT_NAME=node_engo
   MONGO_DB_PREFIX=cc_
 
   # Redis Config
@@ -147,7 +147,7 @@ Since you’re already using `.env` for local development (as shown in `env.txt`
   ```
   Optionally, add a `.env.example` with placeholder values for reference:
   ```
-  APP_NAME="Credit Control"
+  APP_NAME="Node Engo"
   APP_ENV=local
   # ... other variables with placeholder values
   ```
@@ -251,7 +251,7 @@ Add build scripts for each environment. The build process compiles TypeScript to
 - Updated `package.json`:
   ```json
   {
-    "name": "credit_control",
+    "name": "node_engo",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
@@ -263,7 +263,7 @@ Add build scripts for each environment. The build process compiles TypeScript to
       "build:staging": "cross-env NODE_ENV=staging npm run build && cpy .env.staging dist --rename=.env",
       "build:production": "cross-env NODE_ENV=production npm run build && cpy .env.production dist --rename=.env",
       "start": "node dist/server.js",
-      "process-batches": "tsx src/scripts/process-credit-control-batches.mts"
+      "process-batches": "tsx src/scripts/process-node-engo-batches.mts"
     },
     "dependencies": {
       "@azure/storage-blob": "^12.28.0",
@@ -332,7 +332,7 @@ app.listen(config.APP_PORT, () => {
   - Run: `npm run build:local`
   - Output: `./dist` with compiled JS files and `.env` copied from `.env.local`.
   - Run: `npm start` (loads `dist/.env`).
-  - Test locally: `http://nv.api-credit-control.com:8089`.
+  - Test locally: `http://nv.api-node-engo.com:8089`.
 
 - **Staging Environment**:
   - Run: `npm run build:staging`
@@ -357,7 +357,7 @@ app.listen(config.APP_PORT, () => {
     ```bash
     cd /path/to/app
     npm ci --production
-    pm2 start npm --name "credit-control" -- start
+    pm2 start npm --name "node-engo" -- start
     ```
   - Use PM2 for process management: `pm2 logs`, `pm2 monit`.
 
@@ -365,7 +365,7 @@ app.listen(config.APP_PORT, () => {
 Automate builds and deployments with GitHub Actions. Example workflow (`.github/workflows/deploy.yml`):
 
 ```yaml
-name: Deploy Credit Control
+name: Deploy Node Engo
 on:
   push:
     branches: [main, staging]
@@ -392,7 +392,7 @@ jobs:
         env:
           DEPLOY_SERVER: ${{ github.ref_name == 'main' && 'prod-server' || 'staging-server' }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-        run: ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && npm ci --production && pm2 restart credit-control"
+        run: ssh $DEPLOY_USER@$DEPLOY_SERVER "cd $DEPLOY_PATH && npm ci --production && pm2 restart node-engo"
 ```
 
 - Store secrets (e.g., `DEPLOY_USER`, server IPs) in GitHub Secrets.
@@ -415,7 +415,7 @@ jobs:
     }
     ```
 - **Reliability**:
-  - Use PM2 in production for auto-restarts: `pm2 start npm --name "credit-control" -- start`.
+  - Use PM2 in production for auto-restarts: `pm2 start npm --name "node-engo" -- start`.
   - Add a health check endpoint:
     ```typescript
     app.get("/health", (req, res) => sendResponse(res, "Server is healthy", { status: "ok" }, true, 200));
@@ -432,7 +432,7 @@ jobs:
   ```bash
   npm run build:local
   npm start
-  curl http://nv.api-credit-control.com:8089/health
+  curl http://nv.api-node-engo.com:8089/health
   ```
 - **Staging**:
   - Build and deploy to staging server, verify `config.APP_ENV === "staging"`.
